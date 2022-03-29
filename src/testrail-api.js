@@ -2,6 +2,8 @@
 
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
+const FormData = require('form-data')
+const fs = require('fs')
 const { getAuthorization } = require('./get-config')
 
 async function getTestRun(runId, testRailInfo) {
@@ -70,4 +72,48 @@ async function getTestSuite(suiteId, testRailInfo) {
   return json
 }
 
-module.exports = { getTestRun, closeTestRun, getTestSuite }
+async function uploadAttachment(resultId, testRailInfo, path) {
+  const getTestsUrl = `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${resultId}`
+  debug('get tests url: %s', getTestsUrl)
+  const authorization = getAuthorization(testRailInfo)
+  const form = new FormData()
+  form.append('attachment', fs.createReadStream(path))
+
+  // @ts-ignore
+  await got(getTestsUrl, {
+    method: 'POST',
+    body: form,
+    headers: {
+      'Content-Type': `multipart/form-data; boundary=${form.getBoundary()}`,
+      authorization,
+    },
+  })
+
+  return
+}
+async function getTestsForRun(runId, testRailInfo) {
+  const getTestsUrl = `${testRailInfo.host}/index.php?/api/v2/get_tests/${runId}`
+  debug('get tests url: %s', getTestsUrl)
+  const authorization = getAuthorization(testRailInfo)
+
+  // @ts-ignore
+  const json = await got(getTestsUrl, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      authorization,
+    },
+  }).json()
+
+  debug('get test for run %d response', runId)
+  debug(json)
+  return json
+}
+
+module.exports = {
+  getTestRun,
+  closeTestRun,
+  getTestSuite,
+  getTestsForRun,
+  uploadAttachment,
+}

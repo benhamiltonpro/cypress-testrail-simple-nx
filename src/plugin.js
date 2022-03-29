@@ -3,12 +3,15 @@
 // @ts-check
 const debug = require('debug')('cypress-testrail-simple')
 const got = require('got')
+const path = require('path')
+const fs = require('fs')
 const {
   hasConfig,
   getTestRailConfig,
   getAuthorization,
   getTestRunId,
 } = require('../src/get-config')
+const { getTestsForRun, uploadAttachment } = require('../src/testrail-api')
 
 async function sendTestResults(testRailInfo, runId, testResults) {
   debug(
@@ -18,9 +21,9 @@ async function sendTestResults(testRailInfo, runId, testResults) {
   )
   const addResultsUrl = `${testRailInfo.host}/index.php?/api/v2/add_results_for_cases/${runId}`
   const authorization = getAuthorization(testRailInfo)
-
+  console.log('testResults', testResults)
   // @ts-ignore
-  const json = await got(addResultsUrl, {
+  const response = await got(addResultsUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -30,8 +33,44 @@ async function sendTestResults(testRailInfo, runId, testResults) {
       results: testResults,
     },
   }).json()
+  debug('TestRail response: %o', response)
 
-  debug('TestRail response: %o', json)
+  return response
+}
+
+function getAllFiles(dir) {
+  let results = []
+  const list = fs.readdirSync(dir)
+  list.forEach((file) => {
+    file = dir + '/' + file
+    const stat = fs.statSync(file)
+    if (stat && stat.isDirectory()) {
+      results = results.concat(getAllFiles(file))
+    } else {
+      results.push(file)
+    }
+  })
+  return results
+}
+
+async function uploadScreenshots(caseId, resultId) {
+  const SCREENSHOTS_FOLDER_PATH = path.join('./cypress/screenshots')
+  try {
+    if (fs.existsSync(SCREENSHOTS_FOLDER_PATH)) {
+      const files = getAllFiles(SCREENSHOTS_FOLDER_PATH)
+      for (const file of files) {
+        if (file.includes(`C${caseId}`) && /(failed|attempt)/g.test(file)) {
+          try {
+            await uploadAttachment(resultId, './' + file)
+          } catch (err) {
+            console.log('Screenshot upload error: ', err)
+          }
+        }
+      }
+    }
+  } catch (error) {
+    return console.log('Unable to scan screenshots folder: ' + error)
+  }
 }
 
 /**
@@ -99,12 +138,21 @@ function registerPlugin(on, skipPlugin = false) {
     if (testRailResults.length) {
       console.log('TestRail results in %s', spec.relative)
       console.table(testRailResults)
-      return sendTestResults(testRailInfo, runId, testRailResults).catch(
-        (err) => {
+      return sendTestResults(testRailInfo, runId, testRailResults)
+        .then((runResults) => {
+          console.log('TestRail response: %o', runResults)
+          getTestsForRun(runId, testRailInfo).then((tests) => {
+            const failedResults = runResults.filter((x) => x.status_id === 5)
+            failedResults.forEach(async (result) => {
+              const test = tests.find((x) => x.id === result.test_id)
+              await uploadScreenshots(test.case_id, result.id)
+            })
+          })
+        })
+        .catch((err) => {
           console.error('Error sending TestRail results')
           console.error(err)
-        },
-      )
+        })
     }
   })
 }

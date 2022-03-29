@@ -1,10 +1,6 @@
-# cypress-testrail-simple
+# cypress-testrail-simple-nx
 
-[![cypress-testrail-simple](https://img.shields.io/endpoint?url=https://dashboard.cypress.io/badge/simple/41cgid/main&style=flat&logo=cypress)](https://dashboard.cypress.io/projects/41cgid/runs) [![ci](https://github.com/bahmutov/cypress-testrail-simple/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bahmutov/cypress-testrail-simple/actions/workflows/ci.yml) [![CircleCI](https://circleci.com/gh/bahmutov/cypress-testrail-simple/tree/main.svg?style=svg)](https://circleci.com/gh/bahmutov/cypress-testrail-simple/tree/main) ![cypress version](https://img.shields.io/badge/cypress-9.5.3-brightgreen) [![renovate-app badge][renovate-badge]][renovate-app]
-
-> Simple upload of Cypress test results to TestRail
-
-Read the blog post [Cypress And TestRail](https://glebbahmutov.com/blog/cypress-and-testrail/)
+> Simple upload of Cypress test results to TestRail when using NX
 
 ## Install
 
@@ -12,9 +8,9 @@ Add this plugin as a dev dependency
 
 ```
 # If using NPM
-$ npm i -D cypress-testrail-simple
+$ npm i -D cypress-testrail-simple-nx
 # If using Yarn
-$ yarn add -D cypress-testrail-simple
+$ yarn add -D cypress-testrail-simple-nx
 ```
 
 Add the plugin to your Cypress plugin file
@@ -22,8 +18,8 @@ Add the plugin to your Cypress plugin file
 ```js
 // cypress/plugins/index.js
 module.exports = (on, config) => {
-  // https://github.com/bahmutov/cypress-testrail-simple
-  require('cypress-testrail-simple/src/plugin')(on)
+  // https://github.com/benhamiltonpro/cypress-testrail-simple-nx
+  require('cypress-testrail-simple-nx/src/plugin')(on)
 }
 ```
 
@@ -48,7 +44,7 @@ If these variables are present, we assume the user wants to use the plugin. You 
 ```js
 module.exports = (on, config) => {
   // skip loading the plugin
-  require('cypress-testrail-simple/src/plugin')(on, true)
+  require('cypress-testrail-simple-nx/src/plugin')(on, true)
 }
 ```
 
@@ -110,14 +106,9 @@ npx testrail-close-run
 
 During `cypress run` the plugin can send test results for each test case found in the test title using `C\d+` regular expression. To send the results, you need to set the run ID as an environment variable `TESTRAIL_RUN_ID` or by having it in the file `runId.txt`
 
-## Examples
-
-- [bahmutov/test-rail-example](https://github.com/bahmutov/test-rail-example)
-- [bahmutov/test-rail-suite-example](https://github.com/bahmutov/test-rail-suite-example)
-
 ## Debugging
 
-This tool uses [debug](https://github.com/visionmedia/debug#readme) to output verbose logs. To see the logs, run it with environment variable `DEBUG=cypress-testrail-simple`.
+This tool uses [debug](https://github.com/visionmedia/debug#readme) to output verbose logs. To see the logs, run it with environment variable `DEBUG=cypress-testrail-simple-nx`.
 
 To start a new test rail run locally and see how the new run is created
 
@@ -131,23 +122,12 @@ Because [cypress-testrail-reporter](https://github.com/Vivify-Ideas/cypress-test
 
 ## Small print
 
-Author: Gleb Bahmutov &lt;gleb.bahmutov@gmail.com&gt; &copy; 2021
-
-- [@bahmutov](https://twitter.com/bahmutov)
-- [glebbahmutov.com](https://glebbahmutov.com)
-- [blog](https://glebbahmutov.com/blog)
-- [videos](https://www.youtube.com/glebbahmutov)
-- [presentations](https://slides.com/bahmutov)
-- [cypress.tips](https://cypress.tips)
-
 License: MIT - do anything with the code, but don't blame me if it does not work.
 
 Support: if you find any problems with this module, email / tweet /
-[open issue](https://github.com/bahmutov/cypress-testrail-simple/issues) on Github
+[open issue](https://github.com/benhamiltonpro/cypress-testrail-simple-nx/issues) on Github
 
 ## MIT License
-
-Copyright (c) 2021 Gleb Bahmutov &lt;gleb.bahmutov@gmail.com&gt;
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
@@ -169,6 +149,3 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
-
-[renovate-badge]: https://img.shields.io/badge/renovate-app-blue.svg
-[renovate-app]: https://renovateapp.com/
