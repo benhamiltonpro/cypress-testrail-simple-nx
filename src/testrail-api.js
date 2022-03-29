@@ -73,14 +73,14 @@ async function getTestSuite(suiteId, testRailInfo) {
 }
 
 async function uploadAttachment(resultId, testRailInfo, path) {
-  const getTestsUrl = `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${resultId}`
-  debug('get tests url: %s', getTestsUrl)
+  const uploadAttachmentUrl = `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${resultId}`
+  debug('upload url: %s', uploadAttachmentUrl)
   const authorization = getAuthorization(testRailInfo)
   const form = new FormData()
   form.append('attachment', fs.createReadStream(path))
 
   // @ts-ignore
-  await got(getTestsUrl, {
+  await got(uploadAttachmentUrl, {
     method: 'POST',
     body: form,
     headers: {
@@ -88,6 +88,7 @@ async function uploadAttachment(resultId, testRailInfo, path) {
       authorization,
     },
   })
+  debug('uploaded attachment to test result %d', resultId)
 
   return
 }

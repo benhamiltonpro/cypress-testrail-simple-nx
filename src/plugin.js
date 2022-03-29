@@ -55,9 +55,12 @@ function getAllFiles(dir) {
 
 async function uploadScreenshots(caseId, resultId) {
   const SCREENSHOTS_FOLDER_PATH = path.join('./cypress/screenshots')
+  debug('uploading screenshots for case %d', caseId)
   try {
     if (fs.existsSync(SCREENSHOTS_FOLDER_PATH)) {
       const files = getAllFiles(SCREENSHOTS_FOLDER_PATH)
+      debug('found %d screenshots', files.length)
+      debug(files)
       for (const file of files) {
         if (file.includes(`C${caseId}`) && /(failed|attempt)/g.test(file)) {
           try {
@@ -142,11 +145,13 @@ function registerPlugin(on, skipPlugin = false) {
         .then((runResults) => {
           console.log('TestRail response: %o', runResults)
           getTestsForRun(runId, testRailInfo).then((tests) => {
-            const failedResults = runResults.filter((x) => x.status_id === 5)
-            failedResults.forEach(async (result) => {
-              const test = tests.find((x) => x.id === result.test_id)
-              await uploadScreenshots(test.case_id, result.id)
-            })
+            if (tests.length) {
+              const failedResults = runResults.filter((x) => x.status_id === 5)
+              failedResults.forEach(async (result) => {
+                const test = tests.find((x) => x.id === result.test_id)
+                await uploadScreenshots(test.case_id, result.id)
+              })
+            }
           })
         })
         .catch((err) => {
