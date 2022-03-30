@@ -2,7 +2,7 @@
 
 // @ts-check
 
-const debug = require('debug')('cypress-testrail-simple')
+const debug = require('debug')('cypress-testrail-simple-nx')
 const { getTestRunId, getTestRailConfig } = require('../src/get-config')
 const { getTestRun, closeTestRun } = require('../src/testrail-api')
 

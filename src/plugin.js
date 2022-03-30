@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 // @ts-check
-const debug = require('debug')('cypress-testrail-simple')
+const debug = require('debug')('cypress-testrail-simple-nx')
 const got = require('got')
 const path = require('path')
 const fs = require('fs')

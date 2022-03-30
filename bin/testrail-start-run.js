@@ -3,7 +3,7 @@
 // @ts-check
 
 const arg = require('arg')
-const debug = require('debug')('cypress-testrail-simple')
+const debug = require('debug')('cypress-testrail-simple-nx')
 const got = require('got')
 const globby = require('globby')
 const { getTestRailConfig, getAuthorization } = require('../src/get-config')

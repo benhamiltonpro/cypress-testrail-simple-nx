@@ -1,6 +1,6 @@
 {
   "name": "cypress-testrail-simple-nx",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Simple upload of Cypress test results to TestRail",
   "main": "index.js",
   "files": [

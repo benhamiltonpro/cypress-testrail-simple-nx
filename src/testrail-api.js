@@ -1,6 +1,6 @@
 // @ts-check
 
-const debug = require('debug')('cypress-testrail-simple')
+const debug = require('debug')('cypress-testrail-simple-nx')
 const got = require('got')
 const FormData = require('form-data')
 const fs = require('fs')
