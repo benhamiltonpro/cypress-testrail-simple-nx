@@ -61,7 +61,10 @@ describe('Finding test case IDs', () => {
     readFile.withArgs('file2.js', 'utf8').returns(source2)
     readFile.withArgs('file3.js', 'utf8').returns(source3)
     readFile.withArgs('file4.js', 'utf8').returns(source4)
-    const ids = findCases(['file1.js', 'file2.js', 'file3.js', 'file4.js'], readFile)
+    const ids = findCases(
+      ['file1.js', 'file2.js', 'file3.js', 'file4.js'],
+      readFile,
+    )
     expect(ids, 'test cases').to.deep.equal([1, 199, 123])
   })
 
@@ -73,6 +76,18 @@ describe('Finding test case IDs', () => {
     const filename = 'test-spec.js'
     const ids = findCasesInSpec(filename, readFile)
     expect(ids, 'test cases').to.deep.equal([])
+  })
+
+  it('find cases when on same line separated by spaces', () => {
+    const source = `
+      it('C199 C200 new case', () => {
+        cy.wait(15000)
+      })
+    `
+    const readFile = cy.stub().returns(source)
+    const filename = 'test-spec.js'
+    const ids = findCasesInSpec(filename, readFile)
+    expect(ids, 'test cases').to.deep.equal([199, 200])
   })
 
   it('ignores stray Cs', () => {

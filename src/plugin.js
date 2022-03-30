@@ -15,6 +15,7 @@ const {
   getFailedTestsForRun,
   uploadAttachment,
 } = require('../src/testrail-api')
+const { titleToCaseIds } = require('./find-cases')
 
 async function sendTestResults(testRailInfo, runId, testResults) {
   debug(
@@ -126,19 +127,22 @@ function registerPlugin(on, skipPlugin = false) {
       // only look at the test name, not at the suite titles
       const testName = result.title[result.title.length - 1]
       if (testRailCaseReg.test(testName)) {
-        const testRailResult = {
-          case_id: parseInt(testRailCaseReg.exec(testName)[1]),
-          // TestRail status
-          // Passed = 1,
-          // Blocked = 2,
-          // Untested = 3,
-          // Retest = 4,
-          // Failed = 5,
-          // TODO: map all Cypress test states into TestRail status
-          // https://glebbahmutov.com/blog/cypress-test-statuses/
-          status_id: result.state === 'passed' ? 1 : 5,
-        }
-        testRailResults.push(testRailResult)
+        const cases = titleToCaseIds(testName)
+        cases.forEach((caseId) => {
+          const testRailResult = {
+            case_id: caseId,
+            // TestRail status
+            // Passed = 1,
+            // Blocked = 2,
+            // Untested = 3,
+            // Retest = 4,
+            // Failed = 5,
+            // TODO: map all Cypress test states into TestRail status
+            // https://glebbahmutov.com/blog/cypress-test-statuses/
+            status_id: result.state === 'passed' ? 1 : 5,
+          }
+          testRailResults.push(testRailResult)
+        })
       }
     })
     if (testRailResults.length) {
