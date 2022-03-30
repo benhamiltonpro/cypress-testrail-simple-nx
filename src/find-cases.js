@@ -7,7 +7,7 @@ const testCaseIdRegExp = /\bT?C(\d+)\b/g
  * @param title
  * @returns {any}
  */
-export function titleToCaseIds(title) {
+function titleToCaseIds(title) {
   let caseIds = []
 
   let m
