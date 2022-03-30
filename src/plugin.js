@@ -11,7 +11,10 @@ const {
   getAuthorization,
   getTestRunId,
 } = require('../src/get-config')
-const { getTestsForRun, uploadAttachment } = require('../src/testrail-api')
+const {
+  getFailedTestsForRun,
+  uploadAttachment,
+} = require('../src/testrail-api')
 
 async function sendTestResults(testRailInfo, runId, testResults) {
   debug(
@@ -53,7 +56,7 @@ function getAllFiles(dir) {
   return results
 }
 
-async function uploadScreenshots(caseId, resultId) {
+async function uploadScreenshots(testRailInfo, caseId, resultId) {
   const SCREENSHOTS_FOLDER_PATH = path.join('./cypress/screenshots')
   debug('uploading screenshots for case %d', caseId)
   try {
@@ -61,15 +64,15 @@ async function uploadScreenshots(caseId, resultId) {
       const files = getAllFiles(SCREENSHOTS_FOLDER_PATH)
       debug('found %d screenshots', files.length)
       debug(files)
-      for (const file of files) {
+      files.forEach(async (file) => {
         if (file.includes(`C${caseId}`) && /(failed|attempt)/g.test(file)) {
           try {
-            await uploadAttachment(resultId, './' + file)
+            await uploadAttachment(testRailInfo, resultId, './' + file)
           } catch (err) {
             console.log('Screenshot upload error: ', err)
           }
         }
-      }
+      })
     }
   } catch (error) {
     return console.log('Unable to scan screenshots folder: ' + error)
@@ -144,15 +147,20 @@ function registerPlugin(on, skipPlugin = false) {
       return sendTestResults(testRailInfo, runId, testRailResults)
         .then((runResults) => {
           console.log('TestRail response: %o', runResults)
-          getTestsForRun(runId, testRailInfo).then((tests) => {
-            if (tests.length) {
-              const failedResults = runResults.filter((x) => x.status_id === 5)
-              failedResults.forEach(async (result) => {
-                const test = tests.find((x) => x.id === result.test_id)
-                await uploadScreenshots(test.case_id, result.id)
-              })
-            }
-          })
+          // upload screenshots for failed tests
+          if (runResults.filter((result) => result.status_id === 5).length) {
+            getFailedTestsForRun(runId, testRailInfo).then(({ tests }) => {
+              if (tests.length) {
+                const failedResults = runResults.filter(
+                  (x) => x.status_id === 5,
+                )
+                failedResults.forEach(async (result) => {
+                  const test = tests.find((x) => x.id === result.test_id)
+                  await uploadScreenshots(testRailInfo, test.case_id, result.id)
+                })
+              }
+            })
+          }
         })
         .catch((err) => {
           console.error('Error sending TestRail results')

@@ -72,7 +72,11 @@ async function getTestSuite(suiteId, testRailInfo) {
   return json
 }
 
-async function uploadAttachment(resultId, testRailInfo, path) {
+async function uploadAttachment(testRailInfo, resultId, path) {
+  if (!fs.existsSync(path)) {
+    console.log('file not found: %s', path)
+    return
+  }
   const uploadAttachmentUrl = `${testRailInfo.host}/index.php?/api/v2/add_attachment_to_result/${resultId}`
   debug('upload url: %s', uploadAttachmentUrl)
   const authorization = getAuthorization(testRailInfo)
@@ -92,8 +96,8 @@ async function uploadAttachment(resultId, testRailInfo, path) {
 
   return
 }
-async function getTestsForRun(runId, testRailInfo) {
-  const getTestsUrl = `${testRailInfo.host}/index.php?/api/v2/get_tests/${runId}`
+async function getFailedTestsForRun(runId, testRailInfo) {
+  const getTestsUrl = `${testRailInfo.host}/index.php?/api/v2/get_tests/${runId}&status_id=5`
   debug('get tests url: %s', getTestsUrl)
   const authorization = getAuthorization(testRailInfo)
 
@@ -115,6 +119,6 @@ module.exports = {
   getTestRun,
   closeTestRun,
   getTestSuite,
-  getTestsForRun,
+  getFailedTestsForRun,
   uploadAttachment,
 }
