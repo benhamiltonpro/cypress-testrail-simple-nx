@@ -101,6 +101,18 @@ npx testrail-close-run 60
 # read the run ID from the file runId.txt
 npx testrail-close-run
 ```
+### testrail-report-run
+
+To report on a test run, pass the run ID as an argument or in the file `./runId.txt`
+
+Reports as a json string using stdout for parsing
+
+```
+# read the run ID from the command line argument
+npx testrail-report-run 60
+# read the run ID from the file runId.txt
+npx testrail-report-run
+```
 
 ## Sending test results
 
