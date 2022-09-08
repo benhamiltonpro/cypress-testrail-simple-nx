@@ -1,6 +1,6 @@
 {
   "name": "cypress-testrail-simple-nx",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Simple upload of Cypress test results to TestRail",
   "main": "index.js",
   "files": [
@@ -9,7 +9,8 @@
   ],
   "bin": {
     "testrail-close-run": "bin/testrail-close-run.js",
-    "testrail-start-run": "bin/testrail-start-run.js"
+    "testrail-start-run": "bin/testrail-start-run.js",
+    "testrail-report-run": "bin/testrail-report-run.js"
   },
   "scripts": {
     "test": "cypress run",
